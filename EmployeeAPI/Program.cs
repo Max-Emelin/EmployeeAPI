@@ -1,21 +1,42 @@
-using EmployeeAPI;
+using EmployeeAPI.Helpers;
+using EmployeeAPI.Interfaces;
+using EmployeeAPI.Repositories;
+using EmployeeAPI.Services;
+using WebApi.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<DapperContext>();
+{
+    var services = builder.Services;
+    var env = builder.Environment;
 
-builder.Services.AddControllers();
+    services.AddCors();
+    services.AddControllers();
+
+    services.Configure<DbSettings>(builder.Configuration.GetSection("DbSettings"));
+
+    services.AddSingleton<DataContext>();
+    services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+    services.AddScoped<IEmployeeService, EmployeeService>();
+}
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+    await context.Init();
 }
 
-app.UseRouting();
-app.UseAuthorization();
+{
 
-app.MapControllers();
+    app.UseCors(x => x
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
+
+
+    app.MapControllers();
+}
 
 app.Run();
