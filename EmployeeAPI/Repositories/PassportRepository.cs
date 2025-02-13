@@ -7,15 +7,26 @@ using System.Text;
 
 namespace EmployeeAPI.Repositories
 {
+    /// <summary>
+    /// Для паспортов.
+    /// </summary>
     public class PassportRepository : IPassportRepository
     {
+        /// <summary>
+        /// Контекст данных.
+        /// </summary>
         private readonly DataContext _context;
 
+        /// <summary>
+        /// Инициализация репозитория для работы с паспортами.
+        /// </summary>
+        /// <param name="context"> Контекст данных. </param>
         public PassportRepository(DataContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
         public async Task<int> CreatePassportAsync(PassportDto dto, IDbTransaction? transaction = null)
         {
             var shouldCloseConnection = transaction == null;
@@ -37,6 +48,7 @@ namespace EmployeeAPI.Repositories
             }
         }
 
+        /// <inheritdoc />
         public async Task<bool> UpdatePassportAsync(int passportId, PassportDto dto, IDbTransaction? transaction = null)
         {
             var shouldCloseConnection = transaction == null;
@@ -73,6 +85,7 @@ namespace EmployeeAPI.Repositories
             }
         }
 
+        /// <inheritdoc />
         public async Task<bool> DeletePassportByIdAsync(int id, IDbTransaction? transaction = null)
         {
             var shouldCloseConnection = transaction == null;

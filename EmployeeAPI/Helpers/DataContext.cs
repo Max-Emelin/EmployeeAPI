@@ -6,31 +6,51 @@ using Npgsql;
 using System.Data;
 using WebApi.Helpers;
 
+/// <summary>
+/// Контекст данных, использующийся для работы с базой данных.
+/// </summary>
 public class DataContext
 {
+    /// <summary>
+    /// Конфигурация базы данных.
+    /// </summary>
     private DbSettings _dbSettings;
 
+    /// <summary>
+    /// Для инициализации контекста данных.
+    /// </summary>
+    /// <param name="dbSettings"> Конфигурация базы данных. </param>
     public DataContext(IOptions<DbSettings> dbSettings)
     {
         _dbSettings = dbSettings.Value;
     }
 
+    /// <summary>
+    /// Создание подключение к базе данных.
+    /// </summary>
+    /// <returns> Подключение к базе данных. </returns>
     public IDbConnection CreateConnection()
     {
-        var connectionString = $"Host={_dbSettings.Server}; Database={_dbSettings.Database}; Username={_dbSettings.UserId}; Password={_dbSettings.Password};";
+        var connectionString = $"Host={_dbSettings.Server}; Database={_dbSettings.Database}; Username={_dbSettings.UserName}; Password={_dbSettings.Password};";
 
         return new NpgsqlConnection(connectionString);
     }
 
+    /// <summary>
+    /// Асинхронно инициализирует базу данных и таблицы, если они не существуют.
+    /// </summary>
     public async Task Init()
     {
         await _initDatabase();
         await _initTables();
     }
 
+    /// <summary>
+    /// Асинхронная инициализация базы данных, если она не существует.
+    /// </summary>
     private async Task _initDatabase()
     {
-        var connectionString = $"Host={_dbSettings.Server}; Database=postgres; Username={_dbSettings.UserId}; Password={_dbSettings.Password};";
+        var connectionString = $"Host={_dbSettings.Server}; Database=postgres; Username={_dbSettings.UserName}; Password={_dbSettings.Password};";
         using var connection = new NpgsqlConnection(connectionString);
         var sqlDbCount = $"SELECT COUNT(*) FROM pg_database WHERE datname = '{_dbSettings.Database}';";
         var dbCount = await connection.ExecuteScalarAsync<int>(sqlDbCount);
@@ -41,6 +61,9 @@ public class DataContext
         }
     }
 
+    /// <summary>
+    /// Асинхронная инициализация таблиц, если они не существуют.
+    /// </summary>
     private async Task _initTables()
     {
         using var connection = CreateConnection();

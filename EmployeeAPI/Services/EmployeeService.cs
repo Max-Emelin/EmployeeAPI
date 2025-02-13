@@ -5,22 +5,32 @@ using EmployeeAPI.Interfaces.Services;
 
 namespace EmployeeAPI.Services
 {
+    /// <inheritdoc />
     public class EmployeeService : IEmployeeService
     {
+        /// <summary>
+        /// Репозиторий для работы с сотрудниками.
+        /// </summary>
         private readonly IEmployeeRepository _employeeRepository;
 
+        /// <summary>
+        /// Для инициализации сервиса сотрудников.
+        /// </summary>
+        /// <param name="employeeRepository"> Репозиторий для работы с сотрудниками. </param>
         public EmployeeService(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
         }
 
-        public async Task<int> CreateEmployeeAsync(CreateEmployeeDto dto)
+        /// <inheritdoc />
+        public async Task<int> CreateEmployeeAsync(EmployeeDto dto)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
             return await _employeeRepository.CreateEmployeeAsync(dto);
         }
 
+        /// <inheritdoc />
         public async Task<bool> DeleteEmployeeByIdAsync(int id)
         {
             ValidateIdFields(id);
@@ -28,20 +38,21 @@ namespace EmployeeAPI.Services
             return await _employeeRepository.DeleteEmployeeByIdAsync(id);
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(int companyId)
+        /// <inheritdoc />
+        public async Task<IEnumerable<EmployeeDto>> GetEmployeesByCompanyIdAsync(int companyId)
         {
             ValidateIdFields(companyId);
 
             return await _employeeRepository.GetEmployeesByCompanyIdAsync(companyId);
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesByDepartmentIdAsync(int departmentId)
+        /// <inheritdoc />
+        public async Task<IEnumerable<EmployeeDto>> GetEmployeesByDepartmentNameAsync(string departmentName)
         {
-            ValidateIdFields(departmentId);
-
-            return await _employeeRepository.GetEmployeesByDepartmentIdAsync(departmentId);
+            return await _employeeRepository.GetEmployeesByDepartmentNameAsync(departmentName);
         }
 
+        /// <inheritdoc />
         public async Task<bool> UpdateEmployeeAsync(UpdateEmployeeDto dto)
         {
             ArgumentNullException.ThrowIfNull(dto);
@@ -51,6 +62,7 @@ namespace EmployeeAPI.Services
             return await _employeeRepository.UpdateEmployeeAsync(dto);
         }
 
+        /// <inheritdoc />
         private void ValidateIdFields(params int[] ids)
         {
             foreach (var id in ids)

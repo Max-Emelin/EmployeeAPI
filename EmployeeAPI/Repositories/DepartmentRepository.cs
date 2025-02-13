@@ -8,15 +8,24 @@ using System.Text;
 
 namespace EmployeeAPI.Repositories
 {
+    /// <inheritdoc />
     public class DepartmentRepository : IDepartmentRepository
     {
+        /// <summary>
+        /// Контекст данных.
+        /// </summary>
         private readonly DataContext _context;
 
+        /// <summary>
+        /// Инициализация репозитория для работы с департаментами.
+        /// </summary>
+        /// <param name="context"> Контекст данных. </param>
         public DepartmentRepository(DataContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
         public async Task<int> GetIdOrCreateDepartmentAsync(DepartmentDto dto, IDbTransaction? transaction = null)
         {
             var shouldCloseConnection = transaction == null;
@@ -52,6 +61,7 @@ namespace EmployeeAPI.Repositories
             }
         }
 
+        /// <inheritdoc />
         public async Task<bool> UpdateDepartmentAsync(int departmentId, DepartmentDto dto, IDbTransaction? transaction = null)
         {
             var shouldCloseConnection = transaction == null;

@@ -7,12 +7,32 @@ using System.Text;
 
 namespace EmployeeAPI.Repositories
 {
+    /// <summary>
+    /// Для сотрудников.
+    /// </summary>
     public class EmployeeRepository : IEmployeeRepository
     {
+        /// <summary>
+        /// Контекст данных.
+        /// </summary>
         private readonly DataContext _context;
+
+        /// <summary>
+        /// Репозиторий для департаментов.
+        /// </summary>
         private readonly IDepartmentRepository _departmentRepository;
+
+        /// <summary>
+        /// Репозиторий для паспортов.
+        /// </summary>
         private readonly IPassportRepository _passportRepository;
 
+        /// <summary>
+        /// Инициализация репозитория для работы с сотрудниками.
+        /// </summary>
+        /// <param name="context"> Контекст данных. </param>
+        /// <param name="departmentRepository"> Репозиторий для департаментов. </param>
+        /// <param name="passportRepository"> Репозиторий для паспортов. </param>
         public EmployeeRepository(DataContext context, IDepartmentRepository departmentRepository, IPassportRepository passportRepository)
         {
             _context = context;
@@ -20,7 +40,8 @@ namespace EmployeeAPI.Repositories
             _passportRepository = passportRepository;
         }
 
-        public async Task<int> CreateEmployeeAsync(CreateEmployeeDto dto)
+        /// <inheritdoc />
+        public async Task<int> CreateEmployeeAsync(EmployeeDto dto)
         {
             using var connection = _context.CreateConnection();
             connection.Open();
@@ -47,6 +68,7 @@ namespace EmployeeAPI.Repositories
             return employeeId;
         }
 
+        /// <inheritdoc />
         public async Task<bool> DeleteEmployeeByIdAsync(int id)
         {
             var employeeToDelete = await GetEmployeeByIdAsync(id);
@@ -68,20 +90,21 @@ namespace EmployeeAPI.Repositories
             return affectedRows > 0;
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(int companyId)
+        /// <inheritdoc />
+        public async Task<IEnumerable<EmployeeDto>> GetEmployeesByCompanyIdAsync(int companyId)
         {
             using var connection = _context.CreateConnection();
 
             const string sqlQuery = @"
-        SELECT e.Id, e.Name, e.Surname, e.Phone, e.CompanyId, 
-               e.PassportId, p.Type AS PassportType, p.Number AS PassportNumber, 
-               e.DepartmentId, d.Name AS DepartmentName, d.Phone AS DepartmentPhone
-        FROM Employees e
-        LEFT JOIN Passports p ON e.PassportId = p.Id
-        LEFT JOIN Departments d ON e.DepartmentId = d.Id
-        WHERE e.CompanyId = @CompanyId";
+                SELECT e.Id, e.Name, e.Surname, e.Phone, e.CompanyId, 
+                    e.PassportId, p.Type, p.Number, 
+                    e.DepartmentId, d.Name, d.Phone
+                FROM Employees e
+                LEFT JOIN Passports p ON e.PassportId = p.Id
+                LEFT JOIN Departments d ON e.DepartmentId = d.Id
+                WHERE e.CompanyId = @CompanyId";
 
-            var employees = await connection.QueryAsync<Employee, Passport, Department, Employee>(
+            var employees = await connection.QueryAsync<EmployeeDto, PassportDto, DepartmentDto, EmployeeDto>(
                 sqlQuery,
                 (employee, passport, department) =>
                 {
@@ -92,28 +115,44 @@ namespace EmployeeAPI.Repositories
                     return employee;
                 },
                 new { CompanyId = companyId },
-                splitOn: "PassportType, DepartmentName"
+                splitOn: "PassportId,DepartmentId"
             );
 
             return employees;
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesByDepartmentIdAsync(int departmentId)
+        /// <inheritdoc />
+        public async Task<IEnumerable<EmployeeDto>> GetEmployeesByDepartmentNameAsync(string departmentName)
         {
             using var connection = _context.CreateConnection();
 
             const string sqlQuery = @"
                 SELECT e.Id, e.Name, e.Surname, e.Phone, e.CompanyId, 
-                    e.PassportId, p.Type AS PassportType, p.Number AS PassportNumber, 
-                    e.DepartmentId, d.Name AS DepartmentName, d.Phone AS DepartmentPhone
+                    e.PassportId, p.Type, p.Number, 
+                    e.DepartmentId, d.Name, d.Phone
                 FROM Employees e
                 LEFT JOIN Passports p ON e.PassportId = p.Id
                 LEFT JOIN Departments d ON e.DepartmentId = d.Id
-                WHERE e.DepartmentId = @DepartmentId";
+                WHERE d.Name = @DepartmentName";
 
-            return await connection.QueryAsync<Employee>(sqlQuery, new { DepartmentId = departmentId });
+            var employees = await connection.QueryAsync<EmployeeDto, PassportDto, DepartmentDto, EmployeeDto>(
+                sqlQuery,
+                (employee, passport, department) =>
+                {
+
+                    employee.Passport = passport;
+                    employee.Department = department;
+
+                    return employee;
+                },
+                new { DepartmentName = departmentName },
+                splitOn: "PassportId,DepartmentId"
+            );
+
+            return employees;
         }
 
+        /// <inheritdoc />
         public async Task<bool> UpdateEmployeeAsync(UpdateEmployeeDto dto)
         {
             var employeeToUpdate = await GetEmployeeByIdAsync(dto.Id);
@@ -166,6 +205,7 @@ namespace EmployeeAPI.Repositories
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<Employee> GetEmployeeByIdAsync(int id)
         {
             using var connection = _context.CreateConnection();
