@@ -1,5 +1,5 @@
 ﻿using EmployeeAPI.Dto;
-using EmployeeAPI.Interfaces;
+using EmployeeAPI.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeAPI.Controllers
@@ -48,7 +48,7 @@ namespace EmployeeAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateEmployee([FromBody] UpdateEmployeeDto dto)
         {
             try

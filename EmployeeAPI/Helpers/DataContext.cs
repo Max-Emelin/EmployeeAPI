@@ -83,8 +83,8 @@ public class DataContext
                     CompanyId INT,
                     PassportId INT,
                     DepartmentId INT,
-                    FOREIGN KEY (PassportId) REFERENCES Passports(Id) ON DELETE CASCADE,
-                    FOREIGN KEY (DepartmentId) REFERENCES Departments(Id) ON DELETE CASCADE
+                    FOREIGN KEY (PassportId) REFERENCES Passports(Id),
+                    FOREIGN KEY (DepartmentId) REFERENCES Departments(Id) 
                 )";
 
             await connection.ExecuteAsync(createEmployeesTable);

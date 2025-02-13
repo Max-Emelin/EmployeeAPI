@@ -1,6 +1,7 @@
 ﻿using EmployeeAPI.Dto;
 using EmployeeAPI.Entities;
-using EmployeeAPI.Interfaces;
+using EmployeeAPI.Interfaces.Repositories;
+using EmployeeAPI.Interfaces.Services;
 
 namespace EmployeeAPI.Services
 {

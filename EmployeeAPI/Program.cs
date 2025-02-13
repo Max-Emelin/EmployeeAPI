@@ -1,5 +1,6 @@
 using EmployeeAPI.Helpers;
-using EmployeeAPI.Interfaces;
+using EmployeeAPI.Interfaces.Repositories;
+using EmployeeAPI.Interfaces.Services;
 using EmployeeAPI.Repositories;
 using EmployeeAPI.Services;
 using WebApi.Helpers;
@@ -17,6 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 
     services.AddSingleton<DataContext>();
     services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+    services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+    services.AddScoped<IPassportRepository, PassportRepository>();
     services.AddScoped<IEmployeeService, EmployeeService>();
 }
 
@@ -39,4 +42,4 @@ var app = builder.Build();
     app.MapControllers();
 }
 
-app.Run();
+app.Run("http://localhost:8080");

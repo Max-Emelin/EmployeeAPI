@@ -1,9 +1,9 @@
 ﻿using EmployeeAPI.Dto;
 using EmployeeAPI.Entities;
 
-namespace EmployeeAPI.Interfaces
+namespace EmployeeAPI.Interfaces.Services
 {
-    public interface IEmployeeRepository
+    public interface IEmployeeService
     {
         Task<int> CreateEmployeeAsync(CreateEmployeeDto dto);
         Task<bool> DeleteEmployeeByIdAsync(int id);
